@@ -19,17 +19,17 @@ if (!file(".git").exists()) {
     val errorText = """
         
         =====================[ ERROR ]=====================
-         The Canvas project directory is not a properly cloned Git repository.
+         The Aurora project directory is not a properly cloned Git repository.
          
-         In order to build Canvas from source you must clone
+         In order to build Aurora from source you must clone
          the Canvas repository using Git, not download a code
          zip from GitHub.
          
-         Built Canvas jars are available for download at
-         https://canvasmc.io/downloads
+         Aurora is built from source; see the README at
+         https://github.com/AtlasStudioMC/Aurora
          
-         See https://github.com/CraftCanvasMC/Canvas/blob/HEAD/CONTRIBUTING.md
-         for further information on building and modifying Canvas.
+         See https://github.com/AtlasStudioMC/Aurora/blob/HEAD/README.md
+         for further information on building and modifying Aurora.
         ===================================================
     """.trimIndent()
     error(errorText)
@@ -37,8 +37,8 @@ if (!file(".git").exists()) {
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-rootProject.name = "Canvas"
-for (name in listOf("canvas-api", "canvas-server")) {
+rootProject.name = "Aurora"
+for (name in listOf("aurora-api", "aurora-server")) {
     val projName = name.lowercase(Locale.ENGLISH)
     include(projName)
     findProject(":$projName")!!.projectDir = file(name)
@@ -54,12 +54,12 @@ rootDir.listFiles()
 
 gradle.lifecycle.beforeProject {
     val mcVersion = providers.gradleProperty("mcVersion").get().trim()
-    val canvasChannel = providers.gradleProperty("channel").get().trim()
-    val canvasBuildNumber = providers.environmentVariable("BUILD_NUMBER").orNull?.trim()?.toInt()
-    val versionString = if (canvasBuildNumber == null) {
+    val auroraChannel = providers.gradleProperty("channel").get().trim()
+    val auroraBuildNumber = providers.environmentVariable("BUILD_NUMBER").orNull?.trim()?.toInt()
+    val versionString = if (auroraBuildNumber == null) {
         "$mcVersion.local-SNAPSHOT"
     } else {
-        "$mcVersion.build.$canvasBuildNumber-${canvasChannel.lowercase()}"
+        "$mcVersion.build.$auroraBuildNumber-${auroraChannel.lowercase()}"
     }
     version = versionString
 }

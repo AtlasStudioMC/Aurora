@@ -7,7 +7,7 @@ echo "=== Applying all patches ==="
 echo "=== Enabling Git file patches ==="
 BUILD_FILES=(
   "build.gradle.kts"
-  "canvas-server/build.gradle.kts"
+  "aurora-server/build.gradle.kts"
 )
 
 for file in "${BUILD_FILES[@]}"; do
@@ -28,11 +28,11 @@ echo "=== Rebuilding file patches as Git patches ==="
 
 echo "=== Moving file patches to _unapplied ==="
 dirs=(
-  "canvas-server/minecraft-patches/sources canvas-server/minecraft-patches/sources_unapplied"
-  "canvas-server/paper-patches/files canvas-server/paper-patches/files_unapplied"
-  "canvas-server/folia-patches/files canvas-server/folia-patches/files_unapplied"
-  "canvas-api/paper-patches/files canvas-api/paper-patches/files_unapplied"
-  "canvas-api/folia-patches/files canvas-api/folia-patches/files_unapplied"
+  "aurora-server/minecraft-patches/sources aurora-server/minecraft-patches/sources_unapplied"
+  "aurora-server/paper-patches/files aurora-server/paper-patches/files_unapplied"
+  "aurora-server/folia-patches/files aurora-server/folia-patches/files_unapplied"
+  "aurora-api/paper-patches/files aurora-api/paper-patches/files_unapplied"
+  "aurora-api/folia-patches/files aurora-api/folia-patches/files_unapplied"
 )
 
 for dir in "${dirs[@]}"; do

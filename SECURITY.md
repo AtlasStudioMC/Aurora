@@ -1,18 +1,18 @@
 # Security Policy
 
-## Supported Versions
+## Supported versions
 
-Please view our [LTS policy](https://docs.canvasmc.io/canvas/lts/)
+The current Minecraft release only. Aurora tracks CanvasMC, which tracks Paper;
+older Minecraft versions get nothing.
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
-For bugs like behavior oddities and crashes and server errors, please use the issue tracker. Reporting things
-privately in our discord is only for severe vulnerabilities like force-op exploits and mass duplication bugs, etc.
+Most vulnerabilities in Aurora are vulnerabilities in CanvasMC, Folia or Paper,
+because that is where nearly all of the code comes from. If you can reproduce the
+issue on a stock CanvasMC jar, report it to
+[CanvasMC](https://github.com/CraftCanvasMC/Canvas/blob/HEAD/SECURITY.md) — that
+gets it fixed for every fork, including this one.
 
-To report a vulnerability, please open a post in our [discord server](https://discord.gg/uM7eC7rBrW) in the
-[#bug-support forum](https://discord.com/channels/1168986665038127205/1511222824511995994) requesting to
-speak privately about an exploit or vulnerability you discovered. Please do **not** describe this exploit in your
-post and provide as little information as possible publicly. By doing that, the exploit has less chance of
-getting found by others who will abuse this exploit in other production servers. Once in contact privately with
-one of our staff, please provide us with as much information you can about the exploit and we will try and
-prioritize a patch ASAP and will do so as discretely as possible.
+If it is specific to Aurora, open a
+[private security advisory](https://github.com/AtlasStudioMC/Aurora/security/advisories/new)
+on this repository. Please do not describe an exploitable bug in a public issue.
