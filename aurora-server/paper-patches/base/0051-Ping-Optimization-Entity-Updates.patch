@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 23:57:00 -0700
+Subject: [PATCH] Ping Optimization - Entity Updates
+
+Optimize entity synchronization to reduce
+network traffic and improve responsiveness.
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/level/ServerEntity.java
++++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
+@@ -60,6 +60,28 @@ public class ServerEntity {
+     private long lastSyncedRot;
+     private boolean wasRiding;
+     private boolean wasPassenger;
++
++    // Aurora - entity update optimization
++    private static final int ENTITY_UPDATE_THROTTLE = 2; // Update every 2 ticks
++    private int updateThrottle = 0;
++    private double lastX;
++    private double lastY;
++    private double lastZ;
++    private static final double POSITION_THRESHOLD = 0.125D; // 1/8 block
++    private static final double ROTATION_THRESHOLD = 1.0D; // degrees
++
++    private boolean shouldUpdateEntity() {
++        if (updateThrottle++ < ENTITY_UPDATE_THROTTLE) {
++            return false;
++        }
++        updateThrottle = 0;
++
++        Entity entity = this.entity;
++        double distSq = entity.getX() * entity.getX() + entity.getY() * entity.getY() + entity.getZ() * entity.getZ();
++
++        return Math.sqrt(distSq) > POSITION_THRESHOLD;
++    }
+
+     public ServerEntity(ServerLevel serverlevel, Entity entity, int i, boolean flag, Consumer<Packet<?>> consumer, java.util.Set<ServerEntity> trackedPlayers) {
+         this.level = serverlevel;

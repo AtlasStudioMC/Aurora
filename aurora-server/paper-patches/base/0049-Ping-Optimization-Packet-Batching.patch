@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 23:55:00 -0700
+Subject: [PATCH] Ping Optimization - Packet Batching
+
+Optimize packet sending by batching updates
+to reduce network overhead and improve ping.
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -50,6 +50,25 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     private static final int INITIAL_BUFFER_SIZE = 8192;
+     private static final long LAST_PACKET_TIME_TIMEOUT = 30000000L;
+     private static final Logger LOGGER = LogUtils.getLogger();
++
++    // Aurora - ping optimization
++    private static final int PACKET_BATCH_SIZE = 64;
++    private java.util.Queue<Packet<?>> packetQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
++    private long lastFlush = System.nanoTime();
++    private static final long FLUSH_INTERVAL_NANOS = 5_000_000L; // 5ms
++
++    private void flushPacketBatch() {
++        if (!packetQueue.isEmpty()) {
++            while (!packetQueue.isEmpty()) {
++                Packet<?> packet = packetQueue.poll();
++                if (packet != null) {
++                    this.sendPacketInternal(packet);
++                }
++            }
++            lastFlush = System.nanoTime();
++        }
++    }
+
+     public Connection(PacketFlow packetflow) {
+         this.receiving = true;

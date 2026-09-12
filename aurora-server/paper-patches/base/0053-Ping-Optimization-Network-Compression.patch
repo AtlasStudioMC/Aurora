@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 23:59:00 -0700
+Subject: [PATCH] Ping Optimization - Network Compression
+
+Optimize network compression settings to reduce
+bandwidth while maintaining low latency.
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index 1111111111111111111111111111111111111111..2222222222222222222222222222222222222222 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -350,6 +350,20 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     public void setCompressionLevel(int i) {
+         if (i < 0 && i != -1) {
+             throw new IllegalArgumentException("Invalid compression level");
++        }
++
++        // Aurora - optimized compression for ping
++        if (i > 0) {
++            // Use lower compression for lower latency
++            // Level 4 provides good compression vs latency tradeoff
++            i = Math.min(i, 4);
++        }
++
++        if (this.channel != null) {
++            // Aurora - flush pending packets before compression change
++            this.flush();
+         } else {
+             if (i != -1) {
+                 this.channel.pipeline().addBefore("packet_handler", "compression", new CompressionEncoder(i));

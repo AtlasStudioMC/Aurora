@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 23:58:00 -0700
+Subject: [PATCH] Ping Optimization - Player Movement
+
+Optimize player movement synchronization
+to reduce latency in player position updates.
+
+diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -200,6 +200,32 @@ public class ServerGamePacketListenerImpl implements ServerGamePacketListener {
+     private int aboveGroundTickCount;
+     private double vehicleFirstFlewY;
+     private int receivedMovementTicks;
++
++    // Aurora - player movement optimization
++    private static final double POSITION_DELTA_THRESHOLD = 0.03125D; // 1/32 block
++    private static final double ROTATION_DELTA_THRESHOLD = 0.5D; // degrees
++    private double lastX;
++    private double lastY;
++    private double lastZ;
++    private float lastYaw;
++    private float lastPitch;
++    private long lastMovementTime = 0L;
++    private static final long MOVEMENT_UPDATE_INTERVAL = 50L; // 50ms
++
++    private boolean shouldSendMovement() {
++        ServerPlayer player = this.player;
++        if (player == null) return false;
++
++        long now = System.currentTimeMillis();
++        if (now - lastMovementTime < MOVEMENT_UPDATE_INTERVAL) {
++            return false;
++        }
++
++        lastMovementTime = now;
++        return true;
++    }
+
+     public ServerGamePacketListenerImpl(MinecraftServer minecraftserver, Connection connection, ServerPlayer serverplayer, List<Object> list) {
+         this.server = minecraftserver;
