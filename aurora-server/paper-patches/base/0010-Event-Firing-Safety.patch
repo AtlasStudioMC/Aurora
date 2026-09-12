@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 14:00:00 -0700
+Subject: [PATCH] Event Firing Safety
+
+Add defensive checks when firing events to prevent crashes from
+plugin interference in event chain.
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -2400,6 +2400,12 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+     }
+
+     private boolean isSteppingCarefully() {
++        // Aurora - prevent crashes from removed entity during event
++        if (this.isRemoved() || this.level() == null) {
++            return false;
++        }
++        // Aurora end
++
+         return this.isShiftKeyDown() && !(this instanceof Player);
+     }
+
+diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/entity/Mob.java
++++ b/src/main/java/net/minecraft/world/entity/Mob.java
+@@ -1600,6 +1600,11 @@ public abstract class Mob extends LivingEntity {
+     public LivingEntity getControlledVehicle() {
+         Entity entity = this.getVehicle();
+
++        // Aurora - prevent crash on null vehicle entity
++        if (entity == null) {
++            return null;
++        }
++        // Aurora end
+         if (entity instanceof Mob) {
+             return (Mob) entity;
+         }

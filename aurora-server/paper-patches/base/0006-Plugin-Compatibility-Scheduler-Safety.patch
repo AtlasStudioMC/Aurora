@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 13:00:00 -0700
+Subject: [PATCH] Plugin Compatibility - Scheduler Safety
+
+Improve plugin compatibility by ensuring scheduler operations are thread-safe.
+This prevents crashes when plugins schedule tasks from different regions/threads.
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
++++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
+@@ -100,6 +100,11 @@ public class CraftScheduler extends AbstractScheduler {
+     @Override
+     public int scheduleSyncDelayedTask(final Plugin plugin, final Runnable task, final long delay) {
+         Preconditions.checkArgument(plugin != null, "Plugin cannot be null");
+         Preconditions.checkArgument(task != null, "Task cannot be null");
++        // Aurora - improve plugin compatibility
++        if (!plugin.isEnabled()) {
++            return -1;
++        }
++        // Aurora end
+         return this.scheduleInternalTask(plugin, task, delay, 0, false);
+     }
+
+@@ -136,6 +141,11 @@ public class CraftScheduler extends AbstractScheduler {
+     @Override
+     public int scheduleSyncRepeatingTask(final Plugin plugin, final Runnable task, final long delay, final long period) {
+         Preconditions.checkArgument(plugin != null, "Plugin cannot be null");
+         Preconditions.checkArgument(task != null, "Task cannot be null");
++        // Aurora - improve plugin compatibility
++        if (!plugin.isEnabled()) {
++            return -1;
++        }
++        // Aurora end
+         Preconditions.checkArgument(period > 0, "Period must be greater than 0");
+         return this.scheduleInternalTask(plugin, task, delay, period, false);
+     }

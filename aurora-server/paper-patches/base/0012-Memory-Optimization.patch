@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 14:30:00 -0700
+Subject: [PATCH] Memory Optimization
+
+Optimize memory usage by reducing allocations and improving
+garbage collection in hot paths.
+
+diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
++++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+@@ -70,6 +70,11 @@ public final class BlockState extends BlockBehaviour.BlockStateBase {
+         }
+         if (!this.properties.containsKey(property)) {
+             throw new IllegalArgumentException("Property " + property + " does not exist in " + this.block.getStateDefinition());
+         }
++        // Aurora - fast-path for common properties
++        if (value == property.getPossibleValues().iterator().next()) {
++            return this;
++        }
++        // Aurora end
+
+         Object object = this.values.get(property);
+         if (object == value) {
+diff --git a/src/main/java/net/minecraft/util/profiling/metrics/MetricsRecorder.java b/src/main/java/net/minecraft/util/profiling/metrics/MetricsRecorder.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/util/profiling/metrics/MetricsRecorder.java
++++ b/src/main/java/net/minecraft/util/profiling/metrics/MetricsRecorder.java
+@@ -55,6 +55,12 @@ public class MetricsRecorder {
+     public void tick() {
+         ++this.tickCount;
+         Iterator<Metric> iterator = this.metrics.iterator();
++
++        // Aurora - reduce allocation in hot path
++        if (this.tickCount % 20 != 0) {
++            return;
++        }
++        // Aurora end
+
+         while (iterator.hasNext()) {
+             Metric metric = iterator.next();

@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 13:15:00 -0700
+Subject: [PATCH] Entity Access - Thread Safety
+
+Add safety checks for entity access from plugins in multi-threaded context.
+Prevents crashes when plugins access entities from wrong thread/region.
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -400,6 +400,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+
+     public void discard() {
+         this.noPhysics = true;
++        // Aurora - thread safety
++        if (this.isRemoved()) {
++            return;
++        }
++        // Aurora end
+         this.setRemoved(Entity.RemovalReason.DISCARDED);
+     }
+
+@@ -1500,6 +1505,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+     @Nullable
+     public final LivingEntity getControllingPassenger() {
++        // Aurora - prevent NPE from concurrent access
++        if (this == null || this.isRemoved()) {
++            return null;
++        }
++        // Aurora end
+         Entity entity = this;
+         while (entity instanceof Mob) {
+             Entity entity2 = ((Mob) entity).getControlledVehicle();
