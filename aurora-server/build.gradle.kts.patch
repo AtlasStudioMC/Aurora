@@ -134,7 +134,7 @@
 +            "Brand-Id" to "atlasstudiomc:aurora",
 +            "Brand-Name" to "Aurora",
 +            "Brand-Vendor" to "Atlas Studio",
-+            "Brand-Website" to "https://atlasstudiomc.vercel.app",
++            "Brand-Website" to "https://atlasgames.aa.am",
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,

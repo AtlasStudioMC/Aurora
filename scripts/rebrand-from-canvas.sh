@@ -85,7 +85,7 @@ sub "$B" 's/"Specification-Vendor" to "Canvas Team"/"Specification-Vendor" to "A
 sub "$B" 's/"Brand-Id" to "canvasmc:canvas"/"Brand-Id" to "atlasstudiomc:aurora"/'
 sub "$B" 's/"Brand-Name" to "Canvas"/"Brand-Name" to "Aurora"/'
 sub "$B" 's/"Brand-Vendor" to "Canvas Team"/"Brand-Vendor" to "Atlas Studio"/'
-sub "$B" 's|"Brand-Website" to "https://canvasmc.io"|"Brand-Website" to "https://atlasstudiomc.vercel.app"|'
+sub "$B" 's|"Brand-Website" to "https://canvasmc.io"|"Brand-Website" to "https://atlasgames.aa.am"|'
 sub "$B" 's/"Contributors" to canvasContributors,/"Contributors" to auroraContributors,/'
 
 # ---------------------------------------------------------------------------
@@ -118,8 +118,8 @@ sub "$M" 's/performCommand\("canvas help"\)/performCommand("aurora help")/'
 sub "$M" 's/"canvas-logo\.png"/"aurora-logo.png"/'
 
 # The six links in /aurora about. Same count, same shape, real destinations.
-sub "$M" 's|getLink\("Discord", "https://canvasmc.io/discord/", "Click to open the discord server invite"\)|getLink("Website", "https://atlasstudiomc.vercel.app/", "Click to open the Atlas Studio website")|'
-sub "$M" 's|getLink\("Website", "https://canvasmc.io/", "Click to open our website"\)|getLink("Downloads", "https://atlasstudiomc.vercel.app/downloads", "Click to open the Aurora downloads page")|'
+sub "$M" 's|getLink\("Discord", "https://canvasmc.io/discord/", "Click to open the discord server invite"\)|getLink("Website", "https://atlasgames.aa.am/", "Click to open the Atlas Studio website")|'
+sub "$M" 's|getLink\("Website", "https://canvasmc.io/", "Click to open our website"\)|getLink("Downloads", "https://atlasgames.aa.am/downloads", "Click to open the Aurora downloads page")|'
 sub "$M" 's|getLink\("Source", "https://github.com/CraftCanvasMC/Canvas/", "Click to open the CanvasMC source repository"\)|getLink("Source", "https://github.com/AtlasStudioMC/Aurora/", "Click to open the Aurora source repository")|'
 sub "$M" 's|getLink\("Issues", "https://github.com/CraftCanvasMC/Canvas/issues/", "Click to open our issues page on our repository"\)|getLink("Issues", "https://github.com/AtlasStudioMC/Aurora/issues/", "Click to open the Aurora issue tracker")|'
 sub "$M" 's|getLink\("Docs", "https://docs.canvasmc.io/canvas/introduction/", "Click to open Canvas. documentation"\)|getLink("Config docs", "https://docs.canvasmc.io/canvas/introduction/", "Aurora inherits CanvasMC configuration; click for the upstream docs")|'
@@ -139,7 +139,7 @@ while IFS= read -r f; do
     s{resolve\("canvas-patch\.yml"\)}{resolve("aurora-patch.yml")}g;
     s{/config/canvas-worlds\.yml}{/config/aurora-worlds.yml}g;
     s{/canvas reload}{/aurora reload}g;
-    s{https://canvasmc\.io/discord}{https://atlasstudiomc.vercel.app}g;
+    s{https://canvasmc\.io/discord}{https://atlasgames.aa.am}g;
   ' "$f"
 done < <(grep -rIl 'canvas-server\.yml\|canvas-worlds\.yml\|canvas-patch\.yml\|/canvas reload\|canvasmc\.io/discord' aurora-server/src aurora-api 2>/dev/null || true)
 

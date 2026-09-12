@@ -155,7 +155,7 @@ public class GlobalConfiguration extends Part {
                     "If you have questions about certain configuration options please reach out in our discord. As a",
                     "general rule, if you don't know what a certain option does, DO NOT TOUCH IT."
                 ).endLine()
-                .literal("https://atlasstudiomc.vercel.app")
+                .literal("https://atlasgames.aa.am")
                 .compile(60)
         );
     }

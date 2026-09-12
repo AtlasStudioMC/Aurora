@@ -119,7 +119,7 @@ public class WorldConfig extends Part {
                 .wordWrap(
                     "If you have questions about certain configuration options please reach out in our discord"
                 ).endLine()
-                .literal("https://atlasstudiomc.vercel.app")
+                .literal("https://atlasgames.aa.am")
                 .compile(60)
         );
 
