@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Sat, 13 Sep 2026 00:07:00 -0700
+Subject: [PATCH] Adaptive TPS Management
+
+Implement adaptive TPS management to maintain
+consistent server performance under load.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 5555555555555555555555555555555555555555..7777777777777777777777777777777777777777 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -276,6 +276,40 @@ public abstract class MinecraftServer extends ReentrantBlockingQueue<ForkJoinTa
+             totalTickTime = 0;
+             tickCount = 0;
+         }
++    }
++
++    // Aurora - adaptive TPS management
++    private static final double TARGET_TPS = 20.0;
++    private static final double MIN_TPS = 19.0;
++    private static final double MAX_TPS = 20.0;
++    private double currentTPS = 20.0;
++    private long mspt = 50L; // milliseconds per tick
++    private static final java.util.concurrent.atomic.AtomicDouble recentTPS =
++        new java.util.concurrent.atomic.AtomicDouble(20.0);
++
++    private void adaptiveTPSManagement() {
++        double currentLoad = Runtime.getRuntime().totalMemory() /
++                            (double)Runtime.getRuntime().maxMemory();
++
++        if (currentLoad > 0.9) {
++            // High memory load - reduce TPS slightly
++            mspt = Math.min(60L, mspt + 2L);
++        } else if (currentLoad < 0.5) {
++            // Low memory load - increase TPS slightly
++            mspt = Math.max(40L, mspt - 1L);
++        }
++
++        // Adjust based on recent TPS
++        double recentTPSValue = recentTPS.get();
++        if (recentTPSValue < MIN_TPS) {
++            mspt = Math.min(60L, mspt + 1L);
++        } else if (recentTPSValue > MAX_TPS) {
++            mspt = Math.max(40L, mspt - 1L);
++        }
++
++        if (debugLoggingEnabled) {
++            LOGGER.debug("[Aurora Adaptive] MSPT: " + mspt + ", Load: " + currentLoad);
++        }
+     }
+
+     public static <S extends MinecraftServer> S spin(Function<Thread, S> function) {

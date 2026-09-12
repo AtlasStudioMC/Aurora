@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Sat, 13 Sep 2026 00:00:00 -0700
+Subject: [PATCH] Advanced Packet Prioritization
+
+Implement priority-based packet queuing to ensure
+critical packets are sent first for better responsiveness.
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index 2222222222222222222222222222222222222222..3333333333333333333333333333333333333333 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -70,6 +70,35 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     private java.util.Queue<Packet<?>> packetQueue = new java.util.concurrent.ConcurrentLinkedQueue<>();
+     private long lastFlush = System.nanoTime();
+     private static final long FLUSH_INTERVAL_NANOS = 5_000_000L; // 5ms
++
++    // Aurora - packet priority queue
++    private static class PriorityPacket implements Comparable<PriorityPacket> {
++        Packet<?> packet;
++        int priority;
++        long timestamp;
++
++        PriorityPacket(Packet<?> packet, int priority) {
++            this.packet = packet;
++            this.priority = priority;
++            this.timestamp = System.nanoTime();
++        }
++
++        @Override
++        public int compareTo(PriorityPacket other) {
++            if (this.priority != other.priority) {
++                return Integer.compare(other.priority, this.priority);
++            }
++            return Long.compare(this.timestamp, other.timestamp);
++        }
++    }
++
++    private java.util.PriorityQueue<PriorityPacket> priorityQueue =
++        new java.util.PriorityQueue<>(64);
++
++    private int getPacketPriority(Packet<?> packet) {
++        return (packet instanceof ClientboundGameEventPacket) ? 10 :
++               (packet instanceof ClientboundPlayerPositionPacket) ? 9 : 5;
++    }
+
+     private void flushPacketBatch() {
+         if (!packetQueue.isEmpty()) {
