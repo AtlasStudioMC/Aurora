@@ -285,8 +285,8 @@ index 0000000000000000000000000000000000000000..47f1d62d868ddddcf5aab05d82db48a4
 +                                ).type(
 +                                    DialogType.multiAction(
 +                                        List.of(
-+                                            getLink("Website", "https://atlasgames.aa.am/", "Click to open the Atlas Studio website"),
-+                                            getLink("Downloads", "https://atlasgames.aa.am/downloads", "Click to open the Aurora downloads page"),
++                                            getLink("Website", "https://atlasstudio.c0m.to/", "Click to open the Atlas Studio website"),
++                                            getLink("Downloads", "https://atlasstudio.c0m.to/downloads", "Click to open the Aurora downloads page"),
 +                                            getLink("Source", "https://github.com/AtlasStudioMC/Aurora/", "Click to open the Aurora source repository"),
 +                                            getLink("Issues", "https://github.com/AtlasStudioMC/Aurora/issues/", "Click to open the Aurora issue tracker"),
 +                                            getLink("Config docs", "https://docs.canvasmc.io/canvas/introduction/", "Aurora inherits Aurora configuration; click for the upstream docs"),
