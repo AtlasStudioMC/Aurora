@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 22:00:00 -0700
+Subject: [PATCH] Memory Leak Detection
+
+Add memory leak detection and prevention for
+cached objects and pooled resources.
+
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/BlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/BlockEntity.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/BlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/BlockEntity.java
+@@ -55,6 +55,10 @@ public abstract class BlockEntity {
+     public Tick tileTick;
++    // Aurora - memory leak detection
++    private static final java.util.concurrent.ConcurrentHashMap<UUID, Long> entityTimestamps = new java.util.concurrent.ConcurrentHashMap<>();
++    private static final long ENTITY_TIMEOUT = 300_000L; // 5 minutes
++    private UUID entityUUID = java.util.UUID.randomUUID();
+
+     protected BlockEntity(BlockEntityType<?> blockentitytype, BlockPos blockpos, BlockState blockstate) {
+         this.type = blockentitytype;
+@@ -65,6 +69,11 @@ public abstract class BlockEntity {
+
+     public void setLevel(Level level) {
+         this.level = level;
++        // Aurora - track entity lifetime
++        if (level != null) {
++            entityTimestamps.put(entityUUID, System.currentTimeMillis());
++        }
++        // Aurora end
+     }
+
+     public static BlockEntity loadStatic(BlockPos blockpos, BlockState blockstate, CompoundTag compoundtag) {

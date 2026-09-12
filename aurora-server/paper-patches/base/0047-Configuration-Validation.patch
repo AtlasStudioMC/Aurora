@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 23:30:00 -0700
+Subject: [PATCH] Configuration Validation
+
+Validate server configuration at startup
+to prevent crashes from invalid settings.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -650,6 +650,25 @@ public abstract class MinecraftServer extends ReentrantBlockingQueue<ForkJoinTa
+         LOGGER.info("Aurora: Startup validation passed");
+         // Aurora end
++
++        // Aurora - configuration validation
++        try {
++            int maxPlayers = this.getMaxPlayers();
++            if (maxPlayers <= 0) {
++                LOGGER.warn("Aurora: Max players is invalid, resetting to 20");
++                this.maxPlayers = 20;
++            }
++            if (this.getPort() <= 0 || this.getPort() > 65535) {
++                throw new RuntimeException("Aurora: Invalid port number: " + this.getPort());
++            }
++            if (this.getServerIp() == null || this.getServerIp().isEmpty()) {
++                LOGGER.info("Aurora: Server IP is empty, using default");
++            }
++            LOGGER.info("Aurora: Configuration validation passed");
++        } catch (Exception ex) {
++            LOGGER.error("Aurora: Configuration validation failed", ex);
++            throw new RuntimeException("Server configuration invalid", ex);
++        }
++        // Aurora end
+
+         try {
+             this.setupServer();

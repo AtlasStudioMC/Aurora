@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 23:15:00 -0700
+Subject: [PATCH] Debug Logging Enhancement
+
+Add comprehensive debug logging to help diagnose
+server issues and monitor system health.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -185,6 +185,15 @@ public abstract class MinecraftServer extends ReentrantBlockingQueue<ForkJoinTa
+     private long lastTickTime = System.currentTimeMillis();
+     private static final long TICK_TIMEOUT = 30_000L; // 30 seconds
+     private static final java.util.concurrent.ConcurrentHashMap<String, Long> lockTimestamps = new java.util.concurrent.ConcurrentHashMap<>();
++
++    // Aurora - debug logging
++    private static boolean debugLoggingEnabled = false;
++    static {
++        debugLoggingEnabled = System.getProperty("aurora.debug.logging", "false").equalsIgnoreCase("true");
++    }
++
++    private static void debugLog(String message) {
++        if (debugLoggingEnabled) LOGGER.debug("[Aurora Debug] " + message);
++    }
+
+     public static <S extends MinecraftServer> S spin(Function<Thread, S> function) {
+         AtomicReference<S> atomicReference = new AtomicReference();

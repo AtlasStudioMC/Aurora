@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 22:15:00 -0700
+Subject: [PATCH] Startup Validation
+
+Add comprehensive startup validation to ensure
+all critical systems are initialized correctly.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -620,6 +620,20 @@ public abstract class MinecraftServer extends ReentrantBlockingQueue<ForkJoinTa
+         LOGGER.info("Starting Minecraft server on " + this.getServerIp() + ":" + this.getServerPort());
+
++        // Aurora - startup validation
++        try {
++            if (this.playerList == null) {
++                throw new RuntimeException("Player list is null during startup!");
++            }
++            if (this.registryAccess == null) {
++                throw new RuntimeException("Registry access is null during startup!");
++            }
++            LOGGER.info("Aurora: Startup validation passed");
++        } catch (Exception ex) {
++            LOGGER.error("Aurora: Startup validation failed", ex);
++            throw new RuntimeException("Server startup validation failed", ex);
++        }
++        // Aurora end
++
+         try {
+             this.setupServer();
+         } catch (Exception exception) {

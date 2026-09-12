@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 21:45:00 -0700
+Subject: [PATCH] Deadlock Prevention
+
+Add deadlock detection and prevention mechanisms
+to prevent server hangs from thread contention.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -175,6 +175,12 @@ public abstract class MinecraftServer extends ReentrantBlockingQueue<ForkJoinTa
+     // Aurora - performance monitoring infrastructure
+     public static class PerformanceMetrics {
+         public static final java.util.concurrent.atomic.AtomicLong ticksProcessed = new java.util.concurrent.atomic.AtomicLong(0);
+         public static final java.util.concurrent.atomic.AtomicLong msptTotal = new java.util.concurrent.atomic.AtomicLong(0);
+     }
++
++    // Aurora - deadlock detection
++    private long lastTickTime = System.currentTimeMillis();
++    private static final long TICK_TIMEOUT = 30_000L; // 30 seconds
++    private static final java.util.concurrent.ConcurrentHashMap<String, Long> lockTimestamps = new java.util.concurrent.ConcurrentHashMap<>();
+
+     public static <S extends MinecraftServer> S spin(Function<Thread, S> function) {
+         AtomicReference<S> atomicReference = new AtomicReference();

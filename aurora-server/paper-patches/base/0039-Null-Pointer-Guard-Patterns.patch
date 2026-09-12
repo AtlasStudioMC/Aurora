@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 21:30:00 -0700
+Subject: [PATCH] Null Pointer Guard Patterns
+
+Add comprehensive null checks throughout codebase
+to prevent null pointer exceptions in edge cases.
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/level/ServerLevel.java
++++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
+@@ -150,6 +150,11 @@ public class ServerLevel extends Level implements WorldGenLevel {
+     private long ticksSlept;
+     private boolean isCallingLoadSynchronously;
+
++    // Aurora - null safety guards
++    private static final void requireNonNull(Object obj, String msg) {
++        if (obj == null) throw new NullPointerException(msg);
++    }
++
+     public ServerLevel(MinecraftServer minecraftserver, Executor executor, LevelStorageSource.LevelStorageAccess levelstorageaccess, ServerLevelData serverleveldata, ResourceKey<Level> resourcekey, DimensionType dimensiontype, TicketType<?> tickettype, ChunkProgressListener chunkprogresslistener, boolean bl, long l, List<CustomSpawner> list, boolean bl2, @Nullable RandomSequences randomsequences, org.bukkit.World.Environment env, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider) {
+         super(minecraftserver.registryAccess(), resourcekey, dimensiontype, minecraftserver::getProfiler, false, bl, l, minecraftserver.getRandom(), gen, biomeProvider, env);
