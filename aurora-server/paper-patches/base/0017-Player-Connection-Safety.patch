@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 15:45:00 -0700
+Subject: [PATCH] Player Connection Safety
+
+Improve player connection and disconnection handling to prevent
+crashes from state inconsistencies during login/logout.
+
+diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/players/PlayerList.java
++++ b/src/main/java/net/minecraft/server/players/PlayerList.java
+@@ -300,6 +300,11 @@ public abstract class PlayerList {
+
+     public void placeNewPlayer(Connection connection, ServerPlayer serverplayer) {
+         Player entity = this.playersByName.put(serverplayer.getScoreboardName(), serverplayer);
++        // Aurora - safety check
++        if (serverplayer == null || serverplayer.isRemoved()) {
++            this.playersByName.remove(serverplayer.getScoreboardName());
++            return;
++        }
++        // Aurora end
+
+         if (entity != null) {
+             entity.remove(Entity.RemovalReason.DISCARDED);
+@@ -390,6 +395,12 @@ public abstract class PlayerList {
+
+     public void remove(ServerPlayer serverplayer) {
+         ServerLevel serverlevel = serverplayer.serverLevel();
++        // Aurora - safety check
++        if (serverlevel == null) {
++            LOGGER.error("Cannot remove player - no server level!");
++            return;
++        }
++        // Aurora end
+
+         serverplayer.awardStat(Stats.LEAVE_GAME);
+         this.broadcastSystemMessage(Component.translatable("multiplayer.player.left", serverplayer.getDisplayName()), false);

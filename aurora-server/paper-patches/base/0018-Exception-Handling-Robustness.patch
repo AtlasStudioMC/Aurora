@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 16:00:00 -0700
+Subject: [PATCH] Exception Handling Robustness
+
+Add comprehensive exception handling to prevent crashes from
+unhandled exceptions in critical paths.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -900,6 +900,18 @@ public abstract class MinecraftServer extends ReentrantBlockingQueue<ForkJoinTa
+         this.profiler.push("levels");
+         Iterator iterator = this.getAllLevels().iterator();
+
++        // Aurora - robust tick exception handling
++        while (iterator.hasNext()) {
++            ServerLevel serverlevel = (ServerLevel) iterator.next();
++            try {
++                serverlevel.tick(shouldKeepTicking);
++            } catch (Exception ex) {
++                LOGGER.error("Exception ticking level: " + serverlevel.dimension(), ex);
++            }
++        }
++        this.profiler.pop();
++
++        /*
+         while (iterator.hasNext()) {
+             ServerLevel serverlevel = (ServerLevel) iterator.next();
+             serverlevel.tick(shouldKeepTicking);
+         }
+         this.profiler.pop();
++        */
+     }
+
+     public boolean shouldReopenMenu() {

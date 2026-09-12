@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 17:45:00 -0700
+Subject: [PATCH] Resource Cleanup Improvements
+
+Improve resource cleanup and leak prevention to maintain
+stable memory usage over long uptimes.
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -395,6 +395,12 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+     public void remove(RemovalReason removalreason) {
+         if (this.isRemoved()) {
+             return;
++        }
++        // Aurora - cleanup resources
++        try {
++            this.invalidateCaps();
++        } catch (Exception ex) {
++            LOGGER.debug("Error cleaning up entity capabilities", ex);
+         }
+
+         if (this.removalReason == null) {

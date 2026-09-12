@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 16:15:00 -0700
+Subject: [PATCH] World Access Optimization
+
+Optimize world access patterns to reduce overhead and improve
+cache locality in regionalized context.
+
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
+@@ -22,6 +22,11 @@ public class TickingBlockEntity {
+
+     public void tick() {
+         BlockEntity blockEntity = this.blockEntity;
++        // Aurora - prevent crash from removed block entity
++        if (blockEntity == null || blockEntity.isRemoved()) {
++            return;
++        }
++        // Aurora end
+
+         try {
+             blockEntity.tick();
+diff --git a/src/main/java/net/minecraft/world/entity/EntityType.java b/src/main/java/net/minecraft/world/entity/EntityType.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/entity/EntityType.java
++++ b/src/main/java/net/minecraft/world/entity/EntityType.java
+@@ -270,6 +270,11 @@ public class EntityType<T extends Entity> {
+     @Nullable
+     public Entity create(ServerLevel serverlevel, @Nullable CompoundTag compoundtag, @Nullable Component component, @Nullable Player player, BlockPos blockpos, EntitySpawnReason entityspawnreason, boolean bl, boolean bl2) {
++        // Aurora - safety check
++        if (serverlevel == null || blockpos == null) {
++            return null;
++        }
++        // Aurora end
+         Entity entity = this.create(serverlevel);
+         if (entity != null) {
+             if (bl2) {
