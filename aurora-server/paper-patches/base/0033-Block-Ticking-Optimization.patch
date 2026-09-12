@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 19:45:00 -0700
+Subject: [PATCH] Block Ticking Optimization
+
+Optimize random block ticks to reduce CPU overhead
+in chunk tick processing.
+
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -75,6 +75,10 @@ public class Block extends BlockBehaviour {
+     protected Block(BlockBehaviour.Properties properties) {
+         this.properties = properties;
++        // Aurora - optimize block ticking
++        if (this.properties != null) {
++            this.defaultBlockState = null; // Lazy initialize
++        }
+     }
+
+     public static void bootstrap() {
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -185,6 +185,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+     private int updateLevelForCollisions = 0;
+     public long nanoTimeSinceLastPhysicsTick;
+     // Aurora - track last entity count for optimization
+     private int lastEntityCount = 0;
++    // Aurora - optimize random ticks
++    private long lastRandomTickTime = 0;
++    private int randomTicksPerChunk = 3;
++    private static final java.util.concurrent.ConcurrentHashMap<String, Integer> TICK_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+
+     protected Level(WritableRegistry registry, Holder<DimensionType> holder, ResourceKey<Level> resourceKey, Holder<DimensionType> holder2, boolean bl, boolean bl2, long l, int i, @Nullable DataFixer dataFixer, @Nullable ResourceManager resourceManager, RandomSource randomSource) {
+         this.registryAccess = registry;

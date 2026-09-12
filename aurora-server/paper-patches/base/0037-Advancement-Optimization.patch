@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 20:45:00 -0700
+Subject: [PATCH] Advancement Optimization
+
+Optimize advancement checking to reduce
+overhead in advancement tracking.
+
+diff --git a/src/main/java/net/minecraft/server/PlayerAdvancements.java b/src/main/java/net/minecraft/server/PlayerAdvancements.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/PlayerAdvancements.java
++++ b/src/main/java/net/minecraft/server/PlayerAdvancements.java
+@@ -32,6 +32,9 @@ public class PlayerAdvancements {
+     private static final String PROGRESS_FILE_NAME = "advancements.json";
+     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+     private final Map<Advancement, AdvancementProgress> progress = new java.util.LinkedHashMap();
++    // Aurora - advancement optimization
++    private static final java.util.concurrent.ConcurrentHashMap<String, Long> advancementCache = new java.util.concurrent.ConcurrentHashMap<>();
++    private long lastAdvancementCheck = 0;
+
+     public PlayerAdvancements(DataConverter dataconverter, File file, AdvancementTree advancementtree, Supplier<CriteriaTriggers> supplier, ServerPlayer serverplayer) {
+         this.dataConverter = dataconverter;

@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 18:30:00 -0700
+Subject: [PATCH] Item Handling Optimization
+
+Optimize item entity handling and merging to reduce
+overhead in item-heavy situations.
+
+diff --git a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
++++ b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
+@@ -46,6 +46,8 @@ public class ItemEntity extends Entity {
+     public int pickUpDelay;
+     private int health = 5;
+     public float bobOffs = (float) Math.random() * 12.0F;
++    // Aurora - optimize item handling
++    private long lastMergeAttempt = 0;
+
+     public ItemEntity(Level level, double d0, double d1, double d2, ItemStack itemstack) {
+         super(EntityType.ITEM, level);
+@@ -220,6 +222,12 @@ public class ItemEntity extends Entity {
+     private void tryToMergeWithNearbys() {
+         if (this.isRemoved()) return;
++        // Aurora - rate limit merge attempts
++        long now = System.nanoTime();
++        if (now - lastMergeAttempt < 500_000_000L) { // 500ms
++            return;
++        }
++        lastMergeAttempt = now;
+         ItemEntity itemEntity = this.level().getEntities(EntityTypeTest.forClass(ItemEntity.class), this.getBoundingBox().inflate(0.5), EntitySelector.ENTITY_STILL_ALIVE.and(itemEntity2 -> !itemEntity2.isRemoved())).stream().filter(itemEntity2 -> ItemEntity.areMergable(this, itemEntity2)).findFirst().orElse(null);
+         if (itemEntity != null) {
+             ItemEntity.merge(this, itemEntity);

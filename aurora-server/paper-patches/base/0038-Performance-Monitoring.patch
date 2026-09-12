@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 21:00:00 -0700
+Subject: [PATCH] Performance Monitoring
+
+Add performance metrics tracking infrastructure for monitoring
+optimization effectiveness without modifying core tick loop.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -170,6 +170,12 @@ public abstract class MinecraftServer extends ReentrantBlockingQueue<ForkJoinTa
+     public final Thread serverThread;
+     // Aurora - track tick metrics
+     private long lastTickMetrics = 0;
++
++    // Aurora - performance monitoring infrastructure
++    public static class PerformanceMetrics {
++        public static final java.util.concurrent.atomic.AtomicLong ticksProcessed = new java.util.concurrent.atomic.AtomicLong(0);
++        public static final java.util.concurrent.atomic.AtomicLong msptTotal = new java.util.concurrent.atomic.AtomicLong(0);
++    }
+
+     public static <S extends MinecraftServer> S spin(Function<Thread, S> function) {
+         AtomicReference<S> atomicReference = new AtomicReference();

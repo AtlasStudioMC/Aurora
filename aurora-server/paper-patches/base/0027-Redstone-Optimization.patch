@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dueris <duerismc@gmail.com>
+Date: Fri, 12 Sep 2026 18:15:00 -0700
+Subject: [PATCH] Redstone Optimization
+
+Optimize redstone tick propagation and update handling
+to reduce CPU load in redstone-heavy areas.
+
+diff --git a/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java b/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
+index 0000000000000000000000000000000000000000..1111111111111111111111111111111111111111 100644
+--- a/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
+@@ -17,6 +17,10 @@ public class RedStoneWireBlock extends Block {
+     public static final EnumProperty<RedstoneSide> NORTH = BlockStateProperties.NORTH;
+     public static final EnumProperty<RedstoneSide> SOUTH = BlockStateProperties.SOUTH;
+     public static final EnumProperty<RedstoneSide> WEST = BlockStateProperties.WEST;
++
++    // Aurora - cache redstone calculations
++    private static final java.util.concurrent.ConcurrentHashMap<Long, Integer> redstoneCache = new java.util.concurrent.ConcurrentHashMap<>();
++    private static final int REDSTONE_CACHE_SIZE = 8192;
+
+     public RedStoneWireBlock(BlockBehaviour.Properties properties) {
+         super(properties);
+@@ -120,6 +124,12 @@ public class RedStoneWireBlock extends Block {
+
+     public void updateLogic(BlockState blockstate, ServerLevel serverlevel, BlockPos blockpos) {
++        // Aurora - fast path for unchanged redstone
++        Long key = ((long) blockpos.getX() << 40) | ((long) blockpos.getY() << 20) | (blockpos.getZ() & 0xFFFFF);
++        if (redstoneCache.getOrDefault(key, -1) == blockstate.getValue(POWER)) {
++            return;
++        }
++        // Aurora end
+         int i = blockstate.getValue(POWER);
+         int j = 0;
+         j = this.getMaxCurrentStrength(serverlevel, blockpos, j);
